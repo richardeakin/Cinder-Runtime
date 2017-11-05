@@ -206,7 +206,15 @@ namespace {
 #if defined( CINDER_MSW )
 BuildSettings& BuildSettings::vcxproj( const ci::fs::path &path )
 {
-	const auto &projConfig = ProjectConfiguration::instance();
+	// TODO: improve this kludge, probably want to keep a map<fs::path, ProjectConfiguration> around
+	//ProjectConfiguration projConfig = ProjectConfiguration( path );
+	auto &projConfig = ProjectConfiguration::instance();
+	if( ! path.empty() ) {
+		projConfig.setProjectPath( path );
+		projConfig.setProjectDir( path.parent_path() );
+	}
+
+	//const auto &vcxprojPath = ! path.empty() ? path : projConfig.getProjectPath();
 	parseVcxproj( this, XmlTree( loadFile( projConfig.getProjectPath() ) ), projConfig );
 
 	return configuration( projConfig.getConfiguration() ).platform( projConfig.getPlatform() ).platformToolset( projConfig.getPlatformToolset() )
